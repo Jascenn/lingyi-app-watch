@@ -7,7 +7,7 @@
 
 [官网](https://watch.lingyi.tools) · [GitHub Releases](https://github.com/Jascenn/local-software-update-monitor/releases) · [问题反馈](https://github.com/Jascenn/local-software-update-monitor/issues)
 
-![Lingyi App Watch dashboard](./site/assets/dashboard-v0.4.0-public.png)
+![LingYi App Watch dashboard](./site/assets/dashboard-v0.4.0-public.png?v=2)
 
 ## 为什么用它
 
