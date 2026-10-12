@@ -15,6 +15,7 @@ import {
 	upsertStoredAnnotation,
 	upsertStoredAnnotations,
 } from "./storage/annotations.ts";
+import { loadSettings, saveSettings, type MonitorSettings } from "./storage/settings.ts";
 import { loadState, saveSnapshot } from "./storage/state.ts";
 import { renderDashboard } from "./ui/dashboard.ts";
 
@@ -22,9 +23,10 @@ async function main(): Promise<void> {
 	const rootDirectory = cwd();
 	const config = await loadConfig(rootDirectory);
 	const state = await loadState(rootDirectory);
+	let settings = await loadSettings(rootDirectory);
 
 	if (process.argv.includes("--check-once")) {
-		const snapshot = await createSnapshot(config, { rootDirectory });
+		const snapshot = await createSnapshot(config, { rootDirectory, settings });
 		await saveSnapshot(rootDirectory, snapshot);
 		console.log(
 			JSON.stringify(
@@ -49,7 +51,7 @@ async function main(): Promise<void> {
 		}
 
 		runningCheck = (async () => {
-			const snapshot = await createSnapshot(config, { rootDirectory });
+			const snapshot = await createSnapshot(config, { rootDirectory, settings });
 			const stored = await saveSnapshot(rootDirectory, snapshot);
 			latestSnapshot = stored.latest;
 			history = stored.history;
@@ -138,6 +140,76 @@ async function main(): Promise<void> {
 				const annotations = await loadAnnotations(rootDirectory);
 				response.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
 				response.end(request.method === "HEAD" ? undefined : JSON.stringify(annotations, null, 2));
+				return;
+			}
+
+			if (isGetLike && requestUrl.pathname === "/api/settings") {
+				response.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+				response.end(
+					request.method === "HEAD"
+						? undefined
+						: JSON.stringify(
+								{
+									hasApiKey: Boolean(settings.typesafeApiKey?.trim() || process.env.TYPESAFE_API_KEY?.trim()),
+									apiKeyMasked: maskApiKey(settings.typesafeApiKey ?? process.env.TYPESAFE_API_KEY ?? null),
+									source: settings.typesafeApiKey ? "settings" : process.env.TYPESAFE_API_KEY ? "env" : "none",
+									model: settings.typesafeModel ?? process.env.TYPESAFE_MODEL ?? "jev-latest",
+								},
+								null,
+								2,
+							),
+				);
+				return;
+			}
+
+			if (request.method === "POST" && requestUrl.pathname === "/api/settings") {
+				const payload = await readJsonBody(request);
+				const nextSettings: MonitorSettings = { ...settings };
+
+				if (typeof payload.typesafeApiKey === "string") {
+					const trimmed = payload.typesafeApiKey.trim();
+					if (trimmed) {
+						nextSettings.typesafeApiKey = trimmed;
+					} else {
+						delete nextSettings.typesafeApiKey;
+					}
+				}
+				if (typeof payload.typesafeModel === "string") {
+					const trimmed = payload.typesafeModel.trim();
+					if (trimmed) {
+						nextSettings.typesafeModel = trimmed;
+					} else {
+						delete nextSettings.typesafeModel;
+					}
+				}
+				if (typeof payload.typesafeProxyUrl === "string") {
+					const trimmed = payload.typesafeProxyUrl.trim();
+					if (trimmed) {
+						nextSettings.typesafeProxyUrl = trimmed;
+					} else {
+						delete nextSettings.typesafeProxyUrl;
+					}
+				}
+
+				settings = await saveSettings(rootDirectory, nextSettings);
+				void runCheck().catch((error: Error) => {
+					console.error(error.message);
+				});
+
+				response.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+				response.end(
+					JSON.stringify(
+						{
+							ok: true,
+							hasApiKey: Boolean(settings.typesafeApiKey?.trim() || process.env.TYPESAFE_API_KEY?.trim()),
+							apiKeyMasked: maskApiKey(settings.typesafeApiKey ?? process.env.TYPESAFE_API_KEY ?? null),
+							source: settings.typesafeApiKey ? "settings" : process.env.TYPESAFE_API_KEY ? "env" : "none",
+							model: settings.typesafeModel ?? process.env.TYPESAFE_MODEL ?? "jev-latest",
+						},
+						null,
+						2,
+					),
+				);
 				return;
 			}
 
@@ -402,4 +474,15 @@ function truncateMessage(value: string | null | undefined, maxLength = 240): str
 	}
 
 	return `${normalized.slice(0, Math.max(0, maxLength - 3))}...`;
+}
+
+function maskApiKey(key: string | null): string | null {
+	if (!key) {
+		return null;
+	}
+	const trimmed = key.trim();
+	if (trimmed.length <= 8) {
+		return `${trimmed.slice(0, 2)}****`;
+	}
+	return `${trimmed.slice(0, 4)}****${trimmed.slice(-4)}`;
 }

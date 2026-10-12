@@ -6,7 +6,7 @@ export function renderDashboard(
 	thirdPartyPolicy: ThirdPartyPolicyEntry[],
 	annotations: AppAnnotation[],
 ): string {
-	const title = "Lingyi App Watch";
+	const title = "LingYi App Watch";
 	const serialized = JSON.stringify(snapshot).replace(/</g, "\\u003c");
 	const serializedPolicy = JSON.stringify(thirdPartyPolicy).replace(/</g, "\\u003c");
 	const serializedAnnotations = JSON.stringify(annotations).replace(/</g, "\\u003c");
@@ -18,6 +18,9 @@ export function renderDashboard(
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="本地优先的 macOS 软件更新与第三方来源风险看板。" />
 	<title>${title}</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@400;700&display=swap" rel="stylesheet" />
 	<style>
 		:root {
 			--bg: #fbfbfa;
@@ -34,8 +37,9 @@ export function renderDashboard(
 			--accent: #2f3437;
 			--accent-soft: #f6f5f4;
 			--font-body: "LXGW WenKai", "LXGWWenKai", "霞鹜文楷", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", serif;
-			--font-ui: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+			--font-ui: "LXGW WenKai", "LXGWWenKai", "霞鹜文楷", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", serif;
 			--font-heading: "LXGW WenKai", "LXGWWenKai", "霞鹜文楷", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", serif;
+			--font-brand: Georgia, "Times New Roman", serif;
 		}
 
 		* {
@@ -70,6 +74,16 @@ export function renderDashboard(
 			line-height: 1.08;
 			letter-spacing: -0.03em;
 			font-weight: 680;
+		}
+
+		.brand {
+			font-family: var(--font-brand);
+			font-size: 0.72em;
+			font-variant: small-caps;
+			font-style: italic;
+			font-weight: 400;
+			letter-spacing: 0.14em;
+			margin-right: 0.08em;
 		}
 
 		.subhead {
@@ -506,18 +520,124 @@ export function renderDashboard(
 			font-family: var(--font-ui);
 		}
 
-		.badge.up-to-date { background: rgba(47, 123, 65, 0.12); color: var(--ok); }
-		.badge.update-available { background: rgba(184, 92, 38, 0.14); color: var(--warn); }
-		.badge.error { background: rgba(161, 52, 52, 0.14); color: var(--error); }
-		.badge.unknown { background: rgba(111, 107, 93, 0.14); color: var(--unknown); }
-		.badge.normal { background: rgba(32, 75, 87, 0.1); color: var(--accent); }
-		.badge.cautious { background: rgba(184, 92, 38, 0.16); color: var(--warn); }
-		.badge.hold { background: rgba(161, 52, 52, 0.16); color: var(--error); }
-		.badge.mark-watch { background: rgba(32, 75, 87, 0.16); color: var(--accent); }
-		.badge.mark-avoid { background: rgba(161, 52, 52, 0.16); color: var(--error); }
-		.badge.mark-safe { background: rgba(47, 123, 65, 0.14); color: var(--ok); }
-		.badge.mark-ignore { background: rgba(111, 107, 93, 0.14); color: var(--unknown); }
-		.badge.mark-todo { background: rgba(184, 92, 38, 0.16); color: var(--warn); }
+		.badge.up-to-date { background: rgba(47, 123, 65, 0.16); color: #1f6b3c; box-shadow: inset 0 0 0 1px rgba(47, 123, 65, 0.35); }
+		.badge.update-available { background: #fff3e8; color: #a24e12; box-shadow: inset 0 0 0 1px rgba(184, 92, 38, 0.45); }
+		.badge.error { background: #fdeceb; color: #9c352e; box-shadow: inset 0 0 0 1px rgba(161, 52, 52, 0.45); }
+		.badge.unknown { background: #f2f2f0; color: #6d7178; box-shadow: inset 0 0 0 1px rgba(111, 107, 93, 0.35); }
+		.badge.normal { background: #eef4f5; color: #1f4a54; box-shadow: inset 0 0 0 1px rgba(32, 75, 87, 0.3); }
+		.badge.cautious { background: #fdebd9; color: #94500f; box-shadow: inset 0 0 0 1px rgba(184, 92, 38, 0.5); }
+		.badge.hold { background: #fdecea; color: #93261f; box-shadow: inset 0 0 0 1px rgba(161, 52, 52, 0.55); }
+		.badge.mark-watch { background: #e8f1f3; color: #1f4a54; box-shadow: inset 0 0 0 1px rgba(32, 75, 87, 0.4); }
+		.badge.mark-avoid { background: #fdecea; color: #93261f; box-shadow: inset 0 0 0 1px rgba(161, 52, 52, 0.55); }
+		.badge.mark-safe { background: #e9f4ec; color: #1f6b3c; box-shadow: inset 0 0 0 1px rgba(47, 123, 65, 0.45); }
+		.badge.mark-ignore { background: #f2f2f0; color: #6d7178; box-shadow: inset 0 0 0 1px rgba(111, 107, 93, 0.35); }
+		.badge.mark-todo { background: #fdebd9; color: #94500f; box-shadow: inset 0 0 0 1px rgba(184, 92, 38, 0.5); }
+		.badge.ai-risk-low { background: #e3f3e8; color: #17603a; box-shadow: inset 0 0 0 1.5px rgba(47, 123, 65, 0.55); }
+		.badge.ai-risk-medium { background: #fdebd9; color: #94500f; box-shadow: inset 0 0 0 1.5px rgba(184, 92, 38, 0.6); }
+		.badge.ai-risk-high { background: #fde5e3; color: #8f1f18; box-shadow: inset 0 0 0 1.5px rgba(161, 52, 52, 0.65); font-weight: 700; }
+		.badge.ai-risk-unknown { background: #f2f2f0; color: #6d7178; box-shadow: inset 0 0 0 1.5px rgba(111, 107, 93, 0.45); }
+
+		.modal-backdrop {
+			position: fixed;
+			inset: 0;
+			background: rgba(25, 25, 23, 0.35);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 100;
+		}
+
+		.modal-backdrop[hidden] {
+			display: none;
+		}
+
+		.modal {
+			background: var(--card);
+			border-radius: 12px;
+			box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+			width: min(480px, calc(100vw - 32px));
+			overflow: hidden;
+		}
+
+		.modal-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 16px 20px;
+			border-bottom: 1px solid var(--line);
+		}
+
+		.modal-head h3 {
+			margin: 0;
+			font-size: 1rem;
+			font-family: var(--font-heading);
+		}
+
+		.modal-body {
+			padding: 16px 20px 20px;
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+		}
+
+		.settings-label {
+			font-size: 0.78rem;
+			font-weight: 600;
+			color: var(--text);
+			margin-top: 4px;
+		}
+
+		.modal-body input {
+			padding: 8px 10px;
+			border: 1px solid var(--line-strong);
+			border-radius: 8px;
+			font-size: 0.86rem;
+			font-family: var(--font-ui);
+			background: #fff;
+		}
+
+		.modal-body input:focus {
+			outline: 2px solid rgba(47, 123, 65, 0.35);
+			border-color: var(--ok);
+		}
+
+		.modal-actions {
+			display: flex;
+			gap: 8px;
+			margin-top: 12px;
+		}
+
+		.ai-pill {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			margin-left: 10px;
+			padding: 4px 12px;
+			border-radius: 999px;
+			font-size: 0.76rem;
+			font-weight: 600;
+			font-family: var(--font-ui);
+			cursor: pointer;
+			border: 1px solid var(--line-strong);
+			background: #f2f2f0;
+			color: #6d7178;
+			transition: background 0.15s, color 0.15s;
+		}
+
+		.ai-pill:hover {
+			background: #e8e8e6;
+			color: var(--text);
+		}
+
+		.ai-pill.active {
+			background: #e3f3e8;
+			border-color: rgba(47, 123, 65, 0.45);
+			color: #17603a;
+		}
+
+		.ai-pill.active:hover {
+			background: #d5ecdc;
+		}
 
 		.row-hold {
 			background: rgba(178, 76, 69, 0.03);
@@ -561,6 +681,34 @@ export function renderDashboard(
 			background: var(--accent);
 			color: #ffffff;
 			border-color: var(--accent);
+		}
+
+		.site-footer {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			gap: 12px;
+			margin-top: 32px;
+			padding-top: 18px;
+			border-top: 1px solid var(--line);
+			color: var(--muted);
+			font-size: 0.86rem;
+			font-family: var(--font-ui);
+		}
+
+		.site-footer a {
+			color: inherit;
+			text-decoration: none;
+		}
+
+		.site-footer a:hover {
+			color: var(--text);
+		}
+
+		.site-footer-links {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 14px;
 		}
 
 		.action-stack {
@@ -903,14 +1051,37 @@ export function renderDashboard(
 <body>
 	<main>
 		<header>
-			<h1>${title}</h1>
+			<h1><span class="brand">LingYi</span> App Watch</h1>
 			<div class="subhead">本地优先的 macOS 软件更新与来源风险看板。自动监控 Homebrew 和 Mac App Store，并用 GitHub Release、官网 Appcast、JSON 接口和第三方下载页补齐版本来源。</div>
 			<div class="muted" id="meta"></div>
 		</header>
 		<section class="summary" id="summary"></section>
 		<div class="controls">
 			<button id="refreshButton">立即检查</button>
+			<button id="settingsButton" class="ghost">AI 设置</button>
 			<span class="muted">自动轮询间隔：${Math.round(pollIntervalMs / 60_000)} 分钟</span>
+		</div>
+		<div class="modal-backdrop" id="settingsModal" hidden>
+			<div class="modal">
+				<div class="modal-head">
+					<h3>AI 风险评估设置</h3>
+					<button class="ghost" id="settingsCloseButton">关闭</button>
+				</div>
+				<div class="modal-body">
+					<p class="muted">配置 TypeSafe API Key 后，看板会用 JEV 模型对每个可更新项自动评估升级风险。Key 只保存在本机 <code>data/settings.json</code>，不会上传。</p>
+					<label class="settings-label" for="settingsApiKey">API Key</label>
+					<input id="settingsApiKey" type="password" placeholder="粘贴 TypeSafe API Key" autocomplete="off" spellcheck="false" />
+					<div class="muted" id="settingsStatus"></div>
+					<label class="settings-label" for="settingsModel">模型（可选）</label>
+					<input id="settingsModel" type="text" placeholder="默认 jev-latest" autocomplete="off" spellcheck="false" />
+					<label class="settings-label" for="settingsProxy">代理地址（可选，如 http://127.0.0.1:7890）</label>
+					<input id="settingsProxy" type="text" placeholder="TypeSafe 官方 API 在部分地区需要代理访问" autocomplete="off" spellcheck="false" />
+					<div class="modal-actions">
+						<button id="settingsSaveButton">保存并重新检查</button>
+						<button class="ghost" id="settingsClearButton">清除 Key</button>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div class="view-switch" id="viewTabs"></div>
 		<section class="card review-panel" id="reviewPanel" hidden></section>
@@ -1113,6 +1284,15 @@ export function renderDashboard(
 			<div class="result-meta" id="policyMeta"></div>
 		</section>
 		<section id="thirdPartySection"></section>
+
+		<footer class="site-footer">
+			<div>LingYi App Watch · 由 <a href="https://github.com/Jascenn" target="_blank" rel="noreferrer">Jascenn</a> 发起并维护 · <a href="https://github.com/Jascenn/local-software-update-monitor" target="_blank" rel="noreferrer">GitHub 仓库</a></div>
+			<div class="site-footer-links">
+				<a href="https://lingyi.tools" target="_blank" rel="noreferrer">lingyi.tools</a>
+				<a href="https://lingyi.me" target="_blank" rel="noreferrer">lingyi.me</a>
+				<a href="https://watch.lingyi.tools" target="_blank" rel="noreferrer">watch.lingyi.tools</a>
+			</div>
+		</footer>
 	</main>
 
 	<div class="annotation-overlay" id="annotationOverlay">
@@ -1477,6 +1657,14 @@ export function renderDashboard(
 			}
 		}
 
+		function aiRiskBadge(risk) {
+			if (!risk) {
+				return "";
+			}
+			const labelMap = { low: "AI 低风险", medium: "AI 中风险", high: "AI 高风险", unknown: "AI 未判定" };
+			return '<span class="badge ai-risk-' + escapeHtml(risk.riskLevel) + '">' + escapeHtml(labelMap[risk.riskLevel] || "AI 未判定") + '</span>';
+		}
+
 		function actionStateForStatus(item) {
 			const annotation = findAnnotationForStatus(item);
 
@@ -1653,6 +1841,7 @@ export function renderDashboard(
 					item.bundleId,
 					item.notes,
 					item.policyReason,
+					item.aiRisk?.reason,
 					item.error,
 					annotation?.mark,
 					annotation?.note
@@ -1807,6 +1996,20 @@ export function renderDashboard(
 			];
 		}
 
+		function aiStatusPill() {
+			const statuses = snapshot?.statuses ?? [];
+			const assessed = statuses.filter((item) => item.aiRisk && item.aiRisk.source === "jev").length;
+			const high = statuses.filter((item) => item.aiRisk?.riskLevel === "high").length;
+
+			if (assessed > 0) {
+				return '<button class="ai-pill active" type="button" data-open-settings="1" title="点击打开 AI 设置">'
+					+ 'AI 已接入 · 本轮评估 ' + assessed + ' 项' + (high > 0 ? ' · 高风险 ' + high : '')
+					+ '</button>';
+			}
+
+			return '<button class="ai-pill" type="button" data-open-settings="1" title="点击打开 AI 设置">AI 未接入 · 点击配置</button>';
+		}
+
 		function renderSummaryCards() {
 			const summaryNode = document.getElementById("summary");
 			const entries = summaryEntriesData();
@@ -1937,7 +2140,7 @@ export function renderDashboard(
 					return '<article class="focus-card' + (isRiskStatus(item, annotation) ? ' risk' : '') + '">'
 						+ '<div class="focus-card-header"><div><div class="focus-card-title">' + escapeHtml(item.displayName) + '</div><div class="focus-versions">' + escapeHtml(item.installedVersion ?? "未知") + ' → ' + escapeHtml(item.latestVersion ?? "未知") + '</div></div>' + focusActionHtml(item) + '</div>'
 						+ '<div class="focus-meta">' + signals + '</div>'
-						+ '<div class="focus-note">' + escapeHtml(annotation?.note || item.recommendation || item.policyReason || item.notes || item.error || "暂无额外说明") + '</div>'
+						+ '<div class="focus-note">' + escapeHtml(annotation?.note || item.aiRisk?.reason || item.recommendation || item.policyReason || item.notes || item.error || "暂无额外说明") + '</div>'
 						+ '<div class="focus-footer"><button class="ghost row-action" type="button" data-focus-annotate-index="' + index + '">标记</button><span class="muted">最近活动 ' + escapeHtml(formatRelativeDate(item.lastActivityAt)) + '</span></div>'
 						+ '</article>';
 				}).join("");
@@ -1968,7 +2171,7 @@ export function renderDashboard(
 				return '<article class="focus-card risk">'
 					+ '<div class="focus-card-header"><div><div class="focus-card-title">' + escapeHtml(item.displayName) + '</div><div class="focus-versions">' + escapeHtml(item.installedVersion ?? "未知") + ' → ' + escapeHtml(item.latestVersion ?? "未知") + '</div></div>' + focusActionHtml(item) + '</div>'
 					+ '<div class="focus-meta"><span class="badge ' + escapeHtml(item.status) + '">' + escapeHtml(statusLabel(item.status)) + '</span><span class="badge ' + escapeHtml(item.upgradePolicy) + '">' + escapeHtml(policyLabel(item.upgradePolicy)) + '</span>' + (annotation ? annotationBadge(annotation) : "") + '</div>'
-					+ '<div class="focus-note">' + escapeHtml(annotation?.note || item.policyReason || item.recommendation || item.notes || item.error || "需要人工判断。") + '</div>'
+					+ '<div class="focus-note">' + escapeHtml(annotation?.note || item.aiRisk?.reason || item.policyReason || item.recommendation || item.notes || item.error || "需要人工判断。") + '</div>'
 					+ '<div class="focus-footer"><button class="ghost row-action" type="button" data-focus-annotate-index="' + index + '">标记</button><span class="muted">最近活动 ' + escapeHtml(formatRelativeDate(item.lastActivityAt)) + '</span></div>'
 					+ '</article>';
 			}).join("");
@@ -2024,7 +2227,7 @@ export function renderDashboard(
 				return;
 			}
 
-			metaNode.textContent = "上次检查：" + new Date(snapshot.generatedAt).toLocaleString();
+			metaNode.innerHTML = '<span>上次检查：' + escapeHtml(new Date(snapshot.generatedAt).toLocaleString()) + '</span>' + aiStatusPill();
 			renderSummaryCards();
 			renderFocusView(focusNode);
 
@@ -2049,7 +2252,7 @@ export function renderDashboard(
 				const annotation = findAnnotationForStatus(item);
 				const target = buildStatusTarget(item);
 				const selected = isSelectedTarget(target);
-				const detailText = [item.recommendation, item.policyReason, item.notes, item.error].filter(Boolean).join(" · ");
+				const detailText = [item.aiRisk?.reason, item.recommendation, item.policyReason, item.notes, item.error].filter(Boolean).join(" · ");
 				const rowClass = item.upgradePolicy === "hold" ? "row-hold" : item.upgradePolicy === "cautious" ? "row-cautious" : "";
 				const sourceMeta = item.sourceUrl
 					? '<a class="property-pill" href="' + escapeHtml(item.sourceUrl) + '" target="_blank" rel="noreferrer">来源</a>'
@@ -2059,6 +2262,7 @@ export function renderDashboard(
 				const signals = [
 					'<span class="badge ' + escapeHtml(item.status) + '">' + escapeHtml(statusLabel(item.status)) + '</span>',
 					'<span class="badge ' + escapeHtml(item.upgradePolicy) + '">' + escapeHtml(policyLabel(item.upgradePolicy)) + '</span>',
+					aiRiskBadge(item.aiRisk),
 					annotation ? annotationBadge(annotation) : '<span class="property-pill">未标记</span>'
 				].join("");
 				return '<tr class="' + rowClass + '">'
@@ -2598,6 +2802,7 @@ export function renderDashboard(
 
 		function bindControls() {
 			document.getElementById("refreshButton").addEventListener("click", runCheck);
+			bindSettingsModal();
 			document.getElementById("bulkApplyButton").addEventListener("click", applyBulkAnnotation);
 			document.getElementById("bulkDeleteButton").addEventListener("click", deleteBulkAnnotations);
 			document.getElementById("bulkClearSelectionButton").addEventListener("click", clearSelectedTargets);
@@ -2804,6 +3009,97 @@ export function renderDashboard(
 			document.getElementById("annotationOverlay").addEventListener("click", (event) => {
 				if (event.target.id === "annotationOverlay") {
 					closeAnnotationDialog();
+				}
+			});
+		}
+
+		function bindSettingsModal() {
+			const modal = document.getElementById("settingsModal");
+			const statusNode = document.getElementById("settingsStatus");
+			const keyInput = document.getElementById("settingsApiKey");
+			const modelInput = document.getElementById("settingsModel");
+			const proxyInput = document.getElementById("settingsProxy");
+
+			const openModal = async () => {
+				modal.hidden = false;
+				keyInput.value = "";
+				modelInput.value = "";
+				proxyInput.value = "";
+				statusNode.textContent = "加载中…";
+				try {
+					const response = await fetch("/api/settings");
+					const data = await response.json();
+					statusNode.textContent = data.hasApiKey
+						? "当前已配置 Key：" + (data.apiKeyMasked || "（已隐藏）") + "（来源：" + data.source + "，模型：" + data.model + "）"
+						: "尚未配置 API Key，JEV 风险评估当前关闭。";
+					modelInput.placeholder = data.model || "默认 jev-latest";
+				} catch {
+					statusNode.textContent = "无法读取当前设置。";
+				}
+			};
+
+			const closeModal = () => {
+				modal.hidden = true;
+			};
+
+			document.getElementById("settingsButton").addEventListener("click", openModal);
+
+			document.getElementById("meta").addEventListener("click", (event) => {
+				const pill = event.target.closest("[data-open-settings]");
+				if (pill) {
+					openModal();
+				}
+			});
+
+			document.getElementById("settingsCloseButton").addEventListener("click", closeModal);
+			modal.addEventListener("click", (event) => {
+				if (event.target === modal) {
+					closeModal();
+				}
+			});
+
+			document.getElementById("settingsSaveButton").addEventListener("click", async () => {
+				const key = keyInput.value.trim();
+				const model = modelInput.value.trim();
+				const proxy = proxyInput.value.trim();
+				if (!key && !model && !proxy) {
+					statusNode.textContent = "请输入 API Key、模型或代理地址，或直接关闭。";
+					return;
+				}
+				statusNode.textContent = "保存中…";
+				try {
+					const response = await fetch("/api/settings", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ typesafeApiKey: key, typesafeModel: model, typesafeProxyUrl: proxy }),
+					});
+					const data = await response.json();
+					if (!response.ok || !data.ok) {
+						statusNode.textContent = "保存失败：" + (data.error || response.statusText);
+						return;
+					}
+					statusNode.textContent = "已保存，正在重新检查以应用 AI 风险评估…";
+					closeModal();
+					runCheck().catch((error) => {
+						console.error("Re-check after settings save failed:", error);
+					});
+				} catch (error) {
+					statusNode.textContent = "保存失败：" + error.message;
+				}
+			});
+
+			document.getElementById("settingsClearButton").addEventListener("click", async () => {
+				statusNode.textContent = "清除中…";
+				try {
+					await fetch("/api/settings", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ typesafeApiKey: "", typesafeModel: "", typesafeProxyUrl: "" }),
+					});
+					statusNode.textContent = "已清除本机保存的 Key。";
+					closeModal();
+				} catch (error) {
+					statusNode.textContent = "清除失败：" + error.message;
 				}
 			});
 		}

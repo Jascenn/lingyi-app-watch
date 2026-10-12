@@ -1,4 +1,5 @@
 import { buildBundleIndexes, discoverInventory, readAppBundle } from "./discovery.ts";
+import { assessUpgradeRisks, loadJevConfigFromEnv, pickBundleMatch } from "./jev.ts";
 import { runCommand } from "./command.ts";
 import { loadSourceAudit, matchAuditFindingForBundle } from "./source-audit.ts";
 import { findBestBundleForName, loadThirdPartyPolicy, matchPolicyForBundle, matchPolicyForName } from "./source-policy.ts";
@@ -9,6 +10,7 @@ import type {
 	AppBundleRecord,
 	AppStatus,
 	Inventory,
+	JevConfig,
 	MonitorConfig,
 	MonitorAppConfig,
 	RemoteVersionResult,
@@ -19,6 +21,7 @@ import type {
 	ThirdPartyPolicyEntry,
 	UpgradePolicyLevel,
 } from "./types.ts";
+import type { MonitorSettings } from "../storage/settings.ts";
 import { isRemoteNewer, nowIso } from "./utils.ts";
 
 const BREW_ENV = {
@@ -31,6 +34,7 @@ export async function createSnapshot(
 	config: MonitorConfig,
 	options?: {
 		rootDirectory?: string;
+		settings?: MonitorSettings | null;
 	},
 ): Promise<Snapshot> {
 	const [inventory, sourceAudit, sourcePolicy, trackedCandidates] = await Promise.all([
@@ -39,14 +43,29 @@ export async function createSnapshot(
 		options?.rootDirectory ? loadThirdPartyPolicy(options.rootDirectory) : Promise.resolve([]),
 		options?.rootDirectory ? loadTrackedAppCandidates(options.rootDirectory) : Promise.resolve([]),
 	]);
+	const jevConfig = loadJevConfigFromEnv(process.env, options?.settings ?? null);
 	const mergedTrackedApps = mergeTrackedApps(config.trackedApps, candidateConfigs(trackedCandidates));
 	const [brewStatuses, masStatuses, configuredStatuses] = await Promise.all([
-		checkBrewStatuses(inventory, sourcePolicy),
-		checkMasStatuses(inventory, sourcePolicy),
+		checkBrewStatuses(inventory, sourcePolicy, jevConfig),
+		checkMasStatuses(inventory, sourcePolicy, jevConfig),
 		checkConfiguredStatuses(mergedTrackedApps, inventory, sourceAudit, sourcePolicy),
 	]);
 
 	const statuses = dedupeStatuses([...configuredStatuses, ...brewStatuses, ...masStatuses]).sort(compareStatuses);
+
+	if (jevConfig) {
+		try {
+			const assessments = await assessUpgradeRisks(jevConfig, statuses);
+			for (const status of statuses) {
+				const assessment = assessments.get(status.id);
+				if (assessment) {
+					status.aiRisk = assessment;
+				}
+			}
+		} catch (error) {
+			console.error(`JEV risk assessment skipped: ${error instanceof Error ? error.message : "unknown error"}`);
+		}
+	}
 
 	return {
 		generatedAt: nowIso(),
@@ -59,14 +78,18 @@ export async function createSnapshot(
 async function checkBrewStatuses(
 	inventory: Inventory,
 	sourcePolicy: ThirdPartyPolicyEntry[],
+	jevConfig: JevConfig | null,
 ): Promise<AppStatus[]> {
 	const outdated = await fetchBrewOutdated();
 	const checkedAt = nowIso();
 	const summarizedError = truncateMessage(outdated.error);
 
-	return inventory.brewPackages.map((pkg) => {
+	return await Promise.all(inventory.brewPackages.map(async (pkg) => {
 		const outdatedInfo = outdated.entries.get(pkg.name);
-		const matchedBundle = pkg.packageType === "cask" ? findBestBundleForName(pkg.name, inventory.appBundles) : null;
+		const matchedBundle =
+			pkg.packageType === "cask"
+				? await findBestBundleForName(pkg.name, inventory.appBundles, jevConfig)
+				: null;
 		const matchedPolicy =
 			matchPolicyForBundle(matchedBundle, sourcePolicy) ??
 			(pkg.packageType === "cask" ? matchPolicyForName(pkg.name, sourcePolicy) : null);
@@ -93,7 +116,7 @@ async function checkBrewStatuses(
 		} satisfies AppStatus;
 
 		return applyThirdPartyPolicy(baseStatus, matchedPolicy, matchedBundle);
-	});
+	}));
 }
 
 async function fetchBrewOutdated(): Promise<{
@@ -197,14 +220,15 @@ function parseBrewOutdatedVerbose(output: string): Map<string, { latestVersion: 
 async function checkMasStatuses(
 	inventory: Inventory,
 	sourcePolicy: ThirdPartyPolicyEntry[],
+	jevConfig: JevConfig | null,
 ): Promise<AppStatus[]> {
 	const outdated = await fetchMasOutdated();
 	const checkedAt = nowIso();
 	const summarizedError = truncateMessage(outdated.error);
 
-	return inventory.masApps.map((app) => {
+	return await Promise.all(inventory.masApps.map(async (app) => {
 		const outdatedEntry = outdated.entries.get(app.appId);
-		const matchedBundle = findBestBundleForName(app.name, inventory.appBundles);
+		const matchedBundle = await findBestBundleForName(app.name, inventory.appBundles, jevConfig);
 		const matchedPolicy = matchPolicyForBundle(matchedBundle, sourcePolicy) ?? matchPolicyForName(app.name, sourcePolicy);
 		const latestVersion = outdatedEntry?.latestVersion ?? app.installedVersion;
 		const baseStatus = {
@@ -226,7 +250,7 @@ async function checkMasStatuses(
 		} satisfies AppStatus;
 
 		return applyThirdPartyPolicy(baseStatus, matchedPolicy, matchedBundle);
-	});
+	}));
 }
 
 async function fetchMasOutdated(): Promise<{

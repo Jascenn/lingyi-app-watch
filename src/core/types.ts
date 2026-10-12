@@ -11,6 +11,13 @@ export type ActivationSource =
 export type SourceAuditMarker = "macked" | "tnt" | "macwk" | "appstorrent" | "qiuchenly";
 export type AnnotationMark = "watch" | "avoid" | "safe" | "ignore" | "todo";
 
+export interface JevConfig {
+	apiKey: string;
+	model: string;
+	timeoutMs: number;
+	proxyUrl?: string;
+}
+
 export interface AppBundleTarget {
 	kind: "appBundle";
 	path?: string;
@@ -135,6 +142,12 @@ export interface AppStatus {
 	recommendation?: string;
 	notes?: string;
 	error?: string;
+	aiRisk?: {
+		riskLevel: "low" | "medium" | "high" | "unknown";
+		reason: string | null;
+		confidence: number | null;
+		source: "jev" | "fallback";
+	};
 }
 
 export interface SnapshotSummary {

@@ -1,7 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
-import type { AppBundleRecord, ThirdPartyPolicyEntry } from "./types.ts";
+import { pickBundleMatch } from "./jev.ts";
+import type { AppBundleRecord, JevConfig, ThirdPartyPolicyEntry } from "./types.ts";
 
 export async function loadThirdPartyPolicy(rootDirectory: string): Promise<ThirdPartyPolicyEntry[]> {
 	const filePath = resolve(rootDirectory, "data", "third-party-policy.json");
@@ -65,7 +66,11 @@ export function matchPolicyForName(
 	return null;
 }
 
-export function findBestBundleForName(name: string, bundles: AppBundleRecord[]): AppBundleRecord | null {
+export async function findBestBundleForName(
+	name: string,
+	bundles: AppBundleRecord[],
+	jevConfig: JevConfig | null = null,
+): Promise<AppBundleRecord | null> {
 	const normalizedTarget = normalizeName(name);
 
 	if (!normalizedTarget) {
@@ -77,23 +82,53 @@ export function findBestBundleForName(name: string, bundles: AppBundleRecord[]):
 		return exact[0];
 	}
 
-	const fuzzy = bundles
-		.map((bundle) => ({
-			bundle,
-			score: fuzzyNameScore(normalizedTarget, normalizeName(bundle.name)),
-		}))
-		.filter((item) => item.score > 0)
+	// 先用本地前缀/包含关系收敛候选，JEV 只在仍有歧义时兜底
+	const prefixOrContains = bundles
+		.map((bundle) => {
+			const candidate = normalizeName(bundle.name);
+			if (!candidate) {
+				return null;
+			}
+			const isPrefix = candidate.startsWith(normalizedTarget) || normalizedTarget.startsWith(candidate);
+			const contains = candidate.includes(normalizedTarget) || normalizedTarget.includes(candidate);
+			return isPrefix || contains ? { bundle, score: isPrefix ? 90 : 80 } : null;
+		})
+		.filter((item): item is { bundle: AppBundleRecord; score: number } => item !== null)
 		.sort((left, right) => right.score - left.score);
 
-	if (!fuzzy.length) {
+	if (
+		prefixOrContains.length === 1 ||
+		(prefixOrContains.length > 1 && prefixOrContains[0].score > prefixOrContains[1].score)
+	) {
+		return prefixOrContains[0].bundle;
+	}
+
+	if (!prefixOrContains.length) {
+		const fuzzy = bundles
+			.map((bundle) => ({
+				bundle,
+				score: fuzzyNameScore(normalizedTarget, normalizeName(bundle.name)),
+			}))
+			.filter((item) => item.score > 0)
+			.sort((left, right) => right.score - left.score);
+
+		if (fuzzy.length === 1 || (fuzzy.length > 1 && fuzzy[0].score > fuzzy[1].score)) {
+			return fuzzy[0].bundle;
+		}
+
+		if (!jevConfig || bundles.length < 2) {
+			return null;
+		}
+
+		return await pickBundleMatch(jevConfig, name, bundles);
+	}
+
+	// 有多个前缀/包含候选且分数相同，交给 JEV 从中选一个
+	if (!jevConfig) {
 		return null;
 	}
 
-	if (fuzzy.length === 1 || fuzzy[0].score > fuzzy[1].score) {
-		return fuzzy[0].bundle;
-	}
-
-	return null;
+	return await pickBundleMatch(jevConfig, name, prefixOrContains.map((item) => item.bundle));
 }
 
 function fuzzyNameScore(left: string, right: string): number {

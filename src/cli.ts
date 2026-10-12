@@ -111,6 +111,7 @@ async function runStatusCommand(rootDirectory: string, flags: Map<string, string
 			{ header: "ACTIVITY", width: 14, value: (item) => activityLabel(item.lastActivityAt) },
 			{ header: "STATUS", width: 16, value: (item) => item.status },
 			{ header: "POLICY", width: 12, value: (item) => item.upgradePolicy },
+			{ header: "AI", width: 8, value: (item) => item.aiRisk?.riskLevel ?? "-" },
 			{ header: "MARK", width: 12, value: (item) => markLabel(item.annotation?.mark) },
 			{ header: "CHANNEL", width: 18, value: (item) => item.channel },
 			{ header: "INSTALLED", width: 14, value: (item) => item.installedVersion ?? "-" },

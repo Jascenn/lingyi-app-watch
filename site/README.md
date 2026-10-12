@@ -15,7 +15,7 @@
 - Cloudflare Pages 项目：`local-software-update-monitor-site`
 - Cloudflare Pages 根目录：`site`
 - 线上域名：`https://watch.lingyi.tools`
-- 对外截图：`assets/dashboard-v0.3.0-public.png`
+- 对外截图：`assets/dashboard-v0.4.0-public.png`
 
 ## 维护方式
 

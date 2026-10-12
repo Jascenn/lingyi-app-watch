@@ -1,6 +1,6 @@
 {
 	"name": "lingyi-app-watch",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"private": true,
 	"type": "module",
 	"description": "A local-first macOS software update dashboard with third-party source risk controls.",
@@ -17,11 +17,15 @@
 		"cli": "node --experimental-strip-types src/cli.ts",
 		"build": "tsc -p tsconfig.json",
 		"check": "tsc -p tsconfig.json --noEmit",
+		"test": "node --experimental-strip-types --test src/core/__tests__/*.test.ts",
 		"start": "node dist/index.js",
 		"check-once": "node --experimental-strip-types src/index.ts --check-once"
 	},
 	"devDependencies": {
 		"@types/node": "^22.15.18",
 		"typescript": "^5.8.3"
+	},
+	"dependencies": {
+		"undici": "^8.11.2"
 	}
 }
