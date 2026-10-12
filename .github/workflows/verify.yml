@@ -42,7 +42,7 @@ jobs:
           test -f site/index.html
           test -f site/404.html
           test -f site/_headers
-        test -f site/assets/dashboard-v0.4.0-public.png
+          test -f site/assets/dashboard-v0.4.0-public.png
 
       - name: Basic content checks
         run: |
