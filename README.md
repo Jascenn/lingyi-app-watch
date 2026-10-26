@@ -85,3 +85,12 @@ npm run cli -- --view today
 
 由 [Jascenn](https://github.com/Jascenn) 发起并维护。  
 更多信息见 [lingyi.tools](https://lingyi.tools) / [lingyi.me](https://lingyi.me)。
+
+## 贡献与安全
+
+- 参与开发前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
+- 安全问题请按 [SECURITY.md](SECURITY.md) 私下报告，不要开公开 Issue。
+
+## 许可证
+
+本项目原创代码采用 [MIT License](LICENSE)。第三方依赖、上游项目与外部素材继续遵循各自许可证。
