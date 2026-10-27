@@ -13,7 +13,7 @@
 建议保留两层命名：
 
 - 产品名：`Lingyi App Watch`
-- 仓库名：`local-software-update-monitor`
+- 仓库名：`lingyi-app-watch`
 
 先不改仓库名的原因是当前 GitHub 链接已经稳定，改名不影响产品上线价值，反而会增加额外迁移成本。
 
