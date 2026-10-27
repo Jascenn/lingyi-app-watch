@@ -11,8 +11,8 @@
 
 ## 部署约定
 
-- GitHub 仓库：`Jascenn/local-software-update-monitor`
-- Cloudflare Pages 项目：`local-software-update-monitor-site`
+- GitHub 仓库：`Jascenn/lingyi-app-watch`
+- Cloudflare Pages 项目：`lingyi-app-watch-site`
 - Cloudflare Pages 根目录：`site`
 - 线上域名：`https://watch.lingyi.tools`
 - 对外截图：`assets/dashboard-v0.4.0-public.png`

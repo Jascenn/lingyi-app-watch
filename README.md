@@ -5,7 +5,7 @@
 本地优先的 macOS 软件更新看板。  
 它不只是告诉你“有新版本”，还会把软件来源、升级风险和你的人工标记一起整理出来，帮你先判断，再决定要不要升。
 
-[官网](https://watch.lingyi.tools) · [GitHub Releases](https://github.com/Jascenn/local-software-update-monitor/releases) · [问题反馈](https://github.com/Jascenn/local-software-update-monitor/issues)
+[官网](https://watch.lingyi.tools) · [GitHub Releases](https://github.com/Jascenn/lingyi-app-watch/releases) · [问题反馈](https://github.com/Jascenn/lingyi-app-watch/issues)
 
 ![LingYi App Watch dashboard](./site/assets/dashboard-v0.4.0-public.png?v=2)
 
@@ -34,8 +34,8 @@
 ## Quick Start
 
 ```bash
-git clone https://github.com/Jascenn/local-software-update-monitor.git
-cd local-software-update-monitor
+git clone https://github.com/Jascenn/lingyi-app-watch.git
+cd lingyi-app-watch
 npm install
 npm run dev
 ```
