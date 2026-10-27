@@ -1,0 +1,6 @@
+# Repository ownership map. Keep workflow and generated-artifact changes reviewable.
+*                           @Jascenn
+/src/                       @Jascenn
+/site/                      @Jascenn
+/.github/workflows/         @Jascenn
+/package-lock.json          @Jascenn

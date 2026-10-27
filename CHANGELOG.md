@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Add contribution, security, issue-form, CODEOWNERS and license documentation.
+
 ## 0.4.0 - 2026-10-12
 
 - Add optional JEV (TypeSafe System One) AI risk assessment: every pending update gets a low/medium/high risk level, confidence, and reason alongside the local policy rules.
