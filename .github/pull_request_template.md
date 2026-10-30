@@ -15,6 +15,7 @@
 ## Verification
 
 - [ ] Ran `npm run check`
+- [ ] Ran `npm test`
 - [ ] Ran `npm run build`
 - [ ] Checked site copy or layout when relevant
 
