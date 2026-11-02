@@ -22,7 +22,7 @@
 		"check-once": "node --experimental-strip-types src/index.ts --check-once"
 	},
 	"devDependencies": {
-		"@types/node": "^26.6.5",
+		"@types/node": "^26.6.6",
 		"typescript": "^7.0.2"
 	},
 	"dependencies": {
